@@ -1,0 +1,52 @@
+server:
+  ## 服务运行端口配置
+  port: 8005
+spring:
+  application:
+    name: agoraent_gateway
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
+    gateway:
+      routes:
+        ##路由 ID（不是网关ID），保持唯一
+        - id: ktv_online_login
+          #目标服务地址 （加 lb 根据注册中心服务名匹配）
+          uri: lb://ktv-online-login
+          predicates:
+            #   #路由条件，Predicate 接受一个输入参数，返回一个布尔值结果。该接口包含多种默认方法来将 Predicate 组合成其他复杂的逻辑（比如：与，或，非）
+            - Path=/api-login/**
+          #必须加上StripPrefix=1，否则访问服务时会带上provider
+          filters:
+            - StripPrefix=1
+              ##路由 ID（不是网关ID），保持唯一
+        - id: ktv_online_room
+          #目标服务地址 （加 lb 根据注册中心服务名匹配）
+          uri: lb://ktv-online-login
+          predicates:
+            #   #路由条件，Predicate 接受一个输入参数，返回一个布尔值结果。该接口包含多种默认方法来将 Predicate 组合成其他复杂的逻辑（比如：与，或，非）
+            - Path=/api-room/**
+          #必须加上StripPrefix=1，否则访问服务时会带上provider
+          filters:
+            - StripPrefix=1
+      discovery:
+        locator:
+          enabled: true #表明gateway开启服务注册和发现的功能，并且spring cloud gateway自动根据服务发现为每一个服务创建了一个router，这个router将以服务名开头的请求路径转发到对应的服务
+          lower-case-service-id: true
+  ## redis配置信息，按所部署的redis节点信息进行设置即可
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    password:
+    lettuce:
+      pool:
+        max-active: 8
+        max-wait: -1ms
+        max-idle: 8
+        min-idle: 0
+## 用户jwt token生成
+jwt:
+  token:
+    secret: asdfasdfdasf1312312j3l12j3lk2j3kl12j123k12l3
+    exp-time: 3
