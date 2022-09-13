@@ -8,6 +8,16 @@ spring:
     nacos:
       discovery:
         server-addr: 127.0.0.1:8848
+        enabled: false
+    consul:
+      enabled: true
+      discovery:
+        heartbeat:
+          enabled: true
+        health-check-path: /management/health
+        health-check-interval: 5s
+      host: localhost
+      port: 8500
     gateway:
       routes:
         ##路由 ID（不是网关ID），保持唯一
@@ -30,6 +40,14 @@ spring:
           #必须加上StripPrefix=1，否则访问服务时会带上provider
           filters:
             - StripPrefix=1
+        - id: voice_room
+          uri: lb://ktv-online-login
+          predicates:
+            - Path=/voice/**
+        - id: voice_user
+          uri: lb://ktv-online-login
+          predicates:
+            - Path=/user/login/device
       discovery:
         locator:
           enabled: true #表明gateway开启服务注册和发现的功能，并且spring cloud gateway自动根据服务发现为每一个服务创建了一个router，这个router将以服务名开头的请求路径转发到对应的服务
@@ -50,3 +68,9 @@ jwt:
   token:
     secret: asdfasdfdasf1312312j3l12j3lk2j3kl12j123k12l3
     exp-time: 3
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+      base-path: "/management"
