@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class JwtTokenFilter implements GlobalFilter , Ordered {
  
-    private String[] skipAuthUrls = {"/api-login/users/verificationCode","/api-login/users/login"};
+    private String[] skipAuthUrls = {"/api-login/users/verificationCode","/api-login/users/login","/api-login/health"};
  
 
     @Resource
