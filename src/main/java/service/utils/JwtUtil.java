@@ -30,8 +30,6 @@ public class JwtUtil {
     }
 
     public String getUser(String encodedToken) {
-//        String encodedToken = req.getHeader("Authorization");
-//        log.info("【token】==========>" + encodedToken);
         try {
             Claims token = parseJWT(encodedToken);
             if (token.containsKey("user_no")) {
