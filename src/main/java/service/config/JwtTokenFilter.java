@@ -30,10 +30,10 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @Component
 public class JwtTokenFilter implements GlobalFilter , Ordered {
-  
-    private String[] skipAuthUrls =
-            {"/api-login/users/verificationCode", "/api-login/users/login", "/user/login/device"};
 
+    private String[] skipAuthUrls =
+            {"/api-login/users/verificationCode", "/api-login/users/login",
+                    "/api-login/health", "/api-login/callBack/audit", "/user/login/device"};
 
     @Resource
     private StringRedisTemplate redisTemplate;
