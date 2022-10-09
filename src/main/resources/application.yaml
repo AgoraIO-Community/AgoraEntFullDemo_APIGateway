@@ -41,11 +41,11 @@ spring:
           filters:
             - StripPrefix=1
         - id: voice_room
-          uri: lb://ktv-online-login
+          uri: lb://voiceRoom
           predicates:
             - Path=/voice/**
         - id: voice_user
-          uri: lb://ktv-online-login
+          uri: lb://voiceRoom
           predicates:
             - Path=/user/login/device
       discovery:
