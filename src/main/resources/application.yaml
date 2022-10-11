@@ -41,16 +41,16 @@ spring:
           filters:
             - StripPrefix=1
         - id: voice_room
-          uri: lb://voiceRoom
+          uri: lb://voice-room
           predicates:
             - Path=/voice/**
           order: 10
         - id: voice_user
-          uri: lb://voiceRoom
+          uri: lb://voice-room
           predicates:
             - Path=/user/login/device
         - id: voice_health
-          uri: lb://voiceRoom
+          uri: lb://voice-room
           predicates:
             - Path=/voice/management/health
           filters:
