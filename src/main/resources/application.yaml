@@ -44,10 +44,18 @@ spring:
           uri: lb://voiceRoom
           predicates:
             - Path=/voice/**
+          order: 10
         - id: voice_user
           uri: lb://voiceRoom
           predicates:
             - Path=/user/login/device
+        - id: voice_health
+          uri: lb://voiceRoom
+          predicates:
+            - Path=/voice/management/health
+          filters:
+            - StripPrefix=1
+          order: 1
       discovery:
         locator:
           enabled: true #表明gateway开启服务注册和发现的功能，并且spring cloud gateway自动根据服务发现为每一个服务创建了一个router，这个router将以服务名开头的请求路径转发到对应的服务
