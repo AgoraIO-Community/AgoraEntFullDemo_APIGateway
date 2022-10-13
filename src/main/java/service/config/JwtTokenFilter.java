@@ -90,11 +90,11 @@ public class JwtTokenFilter implements GlobalFilter , Ordered {
                     }
                     String tokenKey = "user_token:" + uid;
                     if (!Boolean.TRUE.equals(redisTemplate.hasKey(tokenKey))) {
-                        return authErro(resp, "auth error!");
+                        return authErro(resp, "auth error, the token not found!");
                     } else {
                         String redisToken = redisTemplate.opsForValue().get(tokenKey);
                         if (!token.equals(redisToken)) {
-                            return authErro(resp, "auth error!");
+                            return authErro(resp, "auth error, the token is expired!");
                         }
                         //  更新token过期时间
                         redisTemplate.opsForValue()
@@ -105,15 +105,24 @@ public class JwtTokenFilter implements GlobalFilter , Ordered {
                             chain.filter(exchange.mutate().request(request).build());
                 } else {
                     String userNo = jwtUtil.getUser(token);
-                    if(!redisTemplate.hasKey("user_token:"+userNo)){
-                        return authErro(resp, "认证过期");
-                    }else{
-                        String redisToken = String.valueOf(redisTemplate.opsForValue().get("user_token:"+userNo));
-                        if(!token.equals(redisToken)){
+                    log.info("parse token get userNo: {}", userNo);
+                    if (!redisTemplate.hasKey("user_token:" + userNo)) {
+                        log.warn("redis check has key {} result is false!",
+                                ("user_token" + userNo));
+                        return authErro(resp, "token不存在");
+                    } else {
+                        String redisToken = String.valueOf(
+                                redisTemplate.opsForValue().get("user_token:" + userNo));
+                        if (!token.equals(redisToken)) {
+                            log.warn(
+                                    "check is equals token result is false, request token is {}, redis token is {}",
+                                    token, redisToken);
                             return authErro(resp, "认证过期");
                         }
                         //  更新token过期时间
-                        redisTemplate.opsForValue().set("user_token:"+userNo,token,Integer.parseInt(exTime), TimeUnit.DAYS);
+                        redisTemplate.opsForValue()
+                                .set("user_token:" + userNo, token, Integer.parseInt(exTime),
+                                        TimeUnit.DAYS);
                     }
                     return chain.filter(exchange);
                 }
