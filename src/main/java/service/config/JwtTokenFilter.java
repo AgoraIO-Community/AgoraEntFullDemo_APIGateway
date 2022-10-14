@@ -3,11 +3,14 @@ package service.config;
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
 import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -38,6 +41,9 @@ public class JwtTokenFilter implements GlobalFilter , Ordered {
 
     @Resource
     private StringRedisTemplate redisTemplate;
+
+    @Resource(name = "ktvRedisTemplate")
+    private RedisTemplate<String, String> ktvRedisTemplate;
 
     @Resource
     private JwtUtil jwtUtil;
@@ -106,13 +112,13 @@ public class JwtTokenFilter implements GlobalFilter , Ordered {
                 } else {
                     String userNo = jwtUtil.getUser(token);
                     log.info("parse token get userNo: {}", userNo);
-                    if (!redisTemplate.hasKey("user_token:" + userNo)) {
+                    if (!ktvRedisTemplate.hasKey("user_token:" + userNo)) {
                         log.warn("redis check has key {} result is false!",
                                 ("user_token" + userNo));
                         return authErro(resp, "token不存在");
                     } else {
                         String redisToken = String.valueOf(
-                                redisTemplate.opsForValue().get("user_token:" + userNo));
+                                ktvRedisTemplate.opsForValue().get("user_token:" + userNo));
                         if (!token.equals(redisToken)) {
                             log.warn(
                                     "check is equals token result is false, request token is {}, redis token is {}",
@@ -120,7 +126,7 @@ public class JwtTokenFilter implements GlobalFilter , Ordered {
                             return authErro(resp, "认证过期");
                         }
                         //  更新token过期时间
-                        redisTemplate.opsForValue()
+                        ktvRedisTemplate.opsForValue()
                                 .set("user_token:" + userNo, token, Integer.parseInt(exTime),
                                         TimeUnit.DAYS);
                     }
