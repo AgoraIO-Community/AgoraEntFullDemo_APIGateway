@@ -26,7 +26,7 @@ public class VoiceRoomJwtUtil {
             return null;
         }
         Claims claims = parseJWT(token);
-        if(claims==null){
+        if (claims == null) {
             return null;
         }
         return claims.get("uid", String.class);
@@ -36,10 +36,9 @@ public class VoiceRoomJwtUtil {
         Claims claims = null;
         try {
             if (StringUtils.isNotBlank(token)) {
-                //解析jwt
-                SecretKey key = Keys.hmacShaKeyFor(Base64.getEncoder().encode(secretKey.getBytes()));
-                claims = Jwts.parser().setSigningKey(key)
-                        .parseClaimsJws(token).getBody();
+                SecretKey key =
+                        Keys.hmacShaKeyFor(Base64.getEncoder().encode(secretKey.getBytes()));
+                claims = Jwts.parser().setSigningKey(key).parseClaimsJws(token).getBody();
             }else {
                 log.warn("token is empty!");
             }
